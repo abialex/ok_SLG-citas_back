@@ -23,6 +23,9 @@ public class Address {
     @Column(name = "address", nullable = true)
     private String address;
     
+    @Column(name = "nombreDispositivo", nullable = true)
+    private String nombreDispositivo;
+    
     @Column(name = "activo", nullable = true)
     private boolean activo;
 
@@ -52,6 +55,16 @@ public class Address {
     public void setActivo(boolean activo) {
         this.activo = activo;
     }
+
+    public String getNombreDispositivo() {
+        return nombreDispositivo;
+    }
+
+    public void setNombreDispositivo(String nombreDispositivo) {
+        this.nombreDispositivo = nombreDispositivo;
+    }
+    
+    
     
     
      
