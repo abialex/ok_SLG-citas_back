@@ -149,8 +149,9 @@ public class CitaRest {
             SettingsDoctor oAddSettingsDoctor = json.fromJson(jsonResponse.get("data").toString(), SettingsDoctor.class);
             CitasBootApplication.jpa.getTransaction().begin();
             CitasBootApplication.jpa.persist(oAddSettingsDoctor);
+            CitasBootApplication.jpa.refresh(oAddSettingsDoctor);
             CitasBootApplication.jpa.getTransaction().commit();
-            return "ok";
+            return json.toJson(oAddSettingsDoctor);
         } else {
             return "sin acceso";
         }
