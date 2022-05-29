@@ -9,6 +9,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 /**
  *
@@ -19,19 +21,23 @@ public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    
+
     @Column(name = "address", nullable = true)
     private String address;
-    
+
     @Column(name = "nombreDispositivo", nullable = true)
     private String nombreDispositivo;
-    
+
     @Column(name = "activo", nullable = true)
     private boolean activo;
 
+    @ManyToOne
+    @JoinColumn(insertable = true, updatable = true, name = "idrol", nullable = true)
+    private Rol rol;
+
     public Address() {
     }
-    
+
     public int getId() {
         return id;
     }
@@ -63,11 +69,13 @@ public class Address {
     public void setNombreDispositivo(String nombreDispositivo) {
         this.nombreDispositivo = nombreDispositivo;
     }
-    
-    
-    
-    
-     
-     
-    
+
+    public Rol getRol() {
+        return rol;
+    }
+
+    public void setRol(Rol rol) {
+        this.rol = rol;
+    }
+
 }
