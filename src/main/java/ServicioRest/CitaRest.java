@@ -11,7 +11,10 @@ import Entidades.Cita;
 import Entidades.Doctor;
 import Entidades.HoraAtencion;
 import Entidades.Rol;
+import Util.JPAUtil;
 import com.google.gson.Gson;
+import java.sql.SQLDataException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import net.minidev.json.JSONArray;
@@ -55,8 +58,10 @@ public class CitaRest {
             } else {
                 return "[]";
             }
-        } catch (Exception e) {
-            logger.error(e.toString());
+        }
+        
+        catch (Exception e) {
+            logger.error(e.toString() +" SettingsDoctorAll");
             return "[]";
         }
         
@@ -106,8 +111,8 @@ public class CitaRest {
             } else {
                 return "[]";
             }
-        } catch (Exception e) {
-            logger.error(e.toString());
+        } catch (Exception e) {            
+            CitasBootApplication.jpa =  JPAUtil.getEntityManagerFactory().createEntityManager();
             return "[]";
         }
     }
@@ -132,7 +137,7 @@ public class CitaRest {
                 return "[]";
             }
         } catch (Exception e) {
-            logger.error(e.toString());
+            logger.error(e.toString()+" DoctorAll");
             return "[]";
         }
     }
@@ -148,7 +153,7 @@ public class CitaRest {
                 return "[]";
             }
         } catch (Exception e) {
-            logger.error(e.toString());
+            logger.error(e.toString()+ "HoraAtencionAll");
             return "[]";
         }
     }
@@ -175,7 +180,7 @@ public class CitaRest {
                 return "[ ]";
             }
         } catch (Exception e) {
-            logger.error(e.toString());
+            logger.error(e.toString() +" GetListCitasByFecha");
             return "[]";
         }
     }
@@ -195,7 +200,7 @@ public class CitaRest {
                 return "sin acceso";
             }
         } catch (Exception e) {
-            logger.error(e.toString());
+            logger.error(e.toString() +"AddSettingsDoctor");
             return "error";
         }
     }
@@ -214,7 +219,7 @@ public class CitaRest {
                 return "sin acceso";
             }
         } catch (Exception e) {
-            logger.error(e.toString());
+            logger.error(e.toString()+ " AddCita");
             return "error";
         }
     }
@@ -233,7 +238,7 @@ public class CitaRest {
                 return "sin acceso";
             }
         } catch (Exception e) {
-            logger.error(e.toString());
+            logger.error(e.toString()+ " AddDoctor");
             return "error";
         }
     }
@@ -258,7 +263,7 @@ public class CitaRest {
                 return "sin acceso";
             }
         } catch (Exception e) {
-            logger.error(e.toString());
+            logger.error(e.toString()+ " UpdateSettingsDoctor");
             return "error";
         }
     }
@@ -287,7 +292,7 @@ public class CitaRest {
                 return "sin acceso";
             }
         } catch (Exception e) {
-            logger.error(e.toString());
+            logger.error(e.toString()+" UpdateCita");
             return "error";
         }
     }
@@ -312,7 +317,7 @@ public class CitaRest {
                 return "sin acceso";
             }
         } catch (Exception e) {
-            logger.error(e.toString());
+            logger.error(e.toString() +" UpdateDoctor");
             return "error";
         }
     }
@@ -334,7 +339,7 @@ public class CitaRest {
                 return "sin acceso";
             }
         } catch (Exception e) {
-            logger.error(e.toString());
+            logger.error(e.toString()+" DeleteSettingsDoctor");
             return "error]";
         }
     }
@@ -354,7 +359,7 @@ public class CitaRest {
                 return "sin acceso";
             }
         } catch (Exception e) {
-            logger.error(e.toString());
+            logger.error(e.toString()+ " DeleteCita");
             return "error";
         }
     }
@@ -374,7 +379,7 @@ public class CitaRest {
                 return "sin acceso";
             }
         } catch (Exception e) {
-            logger.error(e.toString());
+            logger.error(e.toString()+ " DeleteDoctor");
             return "error]";
         }
     }
@@ -403,7 +408,7 @@ public class CitaRest {
                 
             }
         } catch (Exception e) {
-            logger.error(e.toString());
+            logger.error(e.toString()+" DeviceExist");
             return false;
         }
     }
