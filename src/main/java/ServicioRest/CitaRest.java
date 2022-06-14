@@ -50,11 +50,10 @@ public class CitaRest {
     }
 
     @PostMapping("/SettingsDoctorAll")
-    String getSettingsDoctor(@RequestBody String response) {
-        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
+    String getSettingsDoctor(@RequestBody JSONObject response) {
         try {
 
-            if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
+            if (DeviceExist(response.getAsString("address"), response.getAsString("nombreDispositivo"))) {
                 List<SettingsDoctor> list = CitasBootApplication.jpa.createQuery("select p from SettingsDoctor p").getResultList();
                 return JSONArray.toJSONString(list);
             } else {
@@ -62,7 +61,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = jsonResponse.getString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo");
                 logger.error(e.toString() + "SettingsDoctorAll-" + nombre);
 
             } catch (JSONException js) {
@@ -122,26 +121,26 @@ public class CitaRest {
             CitasBootApplication.jpa = JPAUtil.getEntityManagerFactory().createEntityManager();
             try {
                 String nombre = response.getAsString("nombreDispositivo");
-                logger.error(e.toString() + "CitaFilter-" + nombre);
+                String version = response.getAsString("version");
+                logger.error(e.toString() + " CitaFilter-" + nombre + "-" + version);
             } catch (JSONException js) {
-                logger.error(js.toString() + "CitaFilter not found NombreDispositivo");
+                logger.error(js.toString() + " CitaFilter not found NombreDispositivo");
             }
             return "[]";
         }
     }
 
     @PostMapping("/DoctorAll")
-    String getDoctor(@RequestBody String response) {
-        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
+    String getDoctor(@RequestBody JSONObject response) {
         try {
-            if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
-                Address oaddress = getAddress(jsonResponse.getString("address"));
+            if (DeviceExist(response.getAsString("address"), response.getAsString("nombreDispositivo"))) {
+                Address oaddress = getAddress(response.getAsString("address"));
                 List<Doctor> list = new ArrayList<>();
 
                 if (oaddress.getRol().getRolname().equals("ADMINISTRADOR")) {
                     list = CitasBootApplication.jpa.createQuery("select p from Doctor p where flag = false and activo = true order by iddoctor asc").getResultList();
                 } else if (oaddress.getRol().getRolname().equals("DOCTOR")) {
-                    SettingsDoctor osettingsdoctor = getSettingDoctor(jsonResponse.getString("address"));
+                    SettingsDoctor osettingsdoctor = getSettingDoctor(response.getAsString("address"));
                     System.out.println(osettingsdoctor.getId());
                     list = CitasBootApplication.jpa.createQuery("select p from Doctor p where flag = false and activo = true and iddoctor =" + osettingsdoctor.getDoctor().getIddoctor() + " order by iddoctor asc").getResultList();
                 }
@@ -151,7 +150,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = jsonResponse.getString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo");
                 logger.error(e.toString() + "DoctorAll-" + nombre);
 
             } catch (JSONException js) {
@@ -163,10 +162,9 @@ public class CitaRest {
     }
 
     @PostMapping("/HoraAtencionAll")
-    String getHoraAtencion(@RequestBody String response) {
-        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
+    String getHoraAtencion(@RequestBody JSONObject response) {
         try {
-            if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
+            if (DeviceExist(response.getAsString("address"), response.getAsString("nombreDispositivo"))) {
                 List<HoraAtencion> list = CitasBootApplication.jpa.createQuery("select p from HoraAtencion p order by idhoraatencion ASC").getResultList();
                 return JSONArray.toJSONString(list);
             } else {
@@ -174,7 +172,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = jsonResponse.getString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo");
                 logger.error(e.toString() + "HoraAtencionAll-" + nombre);
 
             } catch (JSONException js) {
@@ -187,11 +185,10 @@ public class CitaRest {
     //actualiza las citas que tego cada vez que agrego, elimino o modifico
 
     @PostMapping("/GetListCitasByFecha")
-    String getCitasByFecha(@RequestBody String response) {
-        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
+    String getCitasByFecha(@RequestBody JSONObject response) {
         try {
-            if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
-                String id = jsonResponse.get("fecha").toString();
+            if (DeviceExist(response.getAsString("address"), response.getAsString("nombreDispositivo"))) {
+                String id = response.get("fecha").toString();
                 List<Cita> list = CitasBootApplication.jpa.createQuery("select p from Cita p where EXTRACT(year from fechacita)=" + id + "order by minuto ASC").getResultList();
                 String array = "[]";
 
@@ -208,7 +205,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = jsonResponse.getString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo");
                 logger.error(e.toString() + "GetListCitasByFecha-" + nombre);
 
             } catch (JSONException js) {
@@ -220,11 +217,10 @@ public class CitaRest {
     }
 
     @PostMapping("/AddSettingsDoctor")
-    String AddSettingsDoctor(@RequestBody String response) {
-        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
+    String AddSettingsDoctor(@RequestBody JSONObject response) {
         try {
-            if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
-                SettingsDoctor oAddSettingsDoctor = json.fromJson(jsonResponse.get("data").toString(), SettingsDoctor.class);
+            if (DeviceExist(response.getAsString("address"), response.getAsString("nombreDispositivo"))) {
+                SettingsDoctor oAddSettingsDoctor = json.fromJson(response.get("data").toString(), SettingsDoctor.class);
                 CitasBootApplication.jpa.getTransaction().begin();
                 CitasBootApplication.jpa.persist(oAddSettingsDoctor);
                 CitasBootApplication.jpa.refresh(oAddSettingsDoctor);
@@ -235,7 +231,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = jsonResponse.getString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo");
                 logger.error(e.toString() + "AddSettingsDoctor-" + nombre);
 
             } catch (JSONException js) {
@@ -248,14 +244,13 @@ public class CitaRest {
     }
 
     @PostMapping("/AddCita")
-    String AddCita(@RequestBody String response) {
-        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
+    String AddCita(@RequestBody JSONObject response) {
         try {
 
-            if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
-                Address oaddress = getAddress(jsonResponse.getString("address"));
+            if (DeviceExist(response.getAsString("address"), response.getAsString("nombreDispositivo"))) {
+                Address oaddress = getAddress(response.getAsString("address"));
                 if (oaddress.getRol().getRolname().equals("ADMINISTRADOR") || oaddress.getRol().getRolname().equals("ASISTENTE")) {
-                    Cita oAddCita = json.fromJson(jsonResponse.get("data").toString(), Cita.class);
+                    Cita oAddCita = json.fromJson(response.get("data").toString(), Cita.class);
                     CitasBootApplication.jpa.getTransaction().begin();
                     CitasBootApplication.jpa.persist(oAddCita);
                     CitasBootApplication.jpa.getTransaction().commit();
@@ -268,7 +263,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = jsonResponse.getString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo");
                 logger.error(e.toString() + "AddCita-" + nombre);
 
             } catch (JSONException js) {
@@ -280,12 +275,11 @@ public class CitaRest {
     }
 
     @PostMapping("/AddDoctor")
-    String AddDoctor(@RequestBody String response) {
-        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
+    String AddDoctor(@RequestBody JSONObject response) {
         try {
 
-            if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
-                Doctor AddDoctor = json.fromJson(jsonResponse.get("data").toString(), Doctor.class);
+            if (DeviceExist(response.getAsString("address"), response.getAsString("nombreDispositivo"))) {
+                Doctor AddDoctor = json.fromJson(response.get("data").toString(), Doctor.class);
                 CitasBootApplication.jpa.getTransaction().begin();
                 CitasBootApplication.jpa.persist(AddDoctor);
                 CitasBootApplication.jpa.getTransaction().commit();
@@ -295,7 +289,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = jsonResponse.getString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo");
                 logger.error(e.toString() + "AddDoctor-" + nombre);
 
             } catch (JSONException js) {
@@ -308,12 +302,11 @@ public class CitaRest {
 
     //------------------------------------------UPDATE--------------------------------------
     @PostMapping("/UpdateSettingsDoctor")
-    String UpdateSettingsDoctor(@RequestBody String response) {
-        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
+    String UpdateSettingsDoctor(@RequestBody JSONObject response) {        
         try {
 
-            if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
-                SettingsDoctor oSettingsDoctorJSON = json.fromJson(jsonResponse.getString("data"), SettingsDoctor.class);
+            if (DeviceExist(response.getAsString("address"), response.getAsString("nombreDispositivo"))) {
+                SettingsDoctor oSettingsDoctorJSON = json.fromJson(response.getAsString("data"), SettingsDoctor.class);
                 List<SettingsDoctor> list = CitasBootApplication.jpa.createQuery("select p from SettingsDoctor p where id=" + oSettingsDoctorJSON.getId()).getResultList();
                 SettingsDoctor oSettingsDoctorUpdate = list.get(0);
                 oSettingsDoctorUpdate.setDoctor(oSettingsDoctorJSON.getDoctor());
@@ -328,7 +321,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = jsonResponse.getString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo");
                 logger.error(e.toString() + "UpdateSettingsDoctor-" + nombre);
 
             } catch (JSONException js) {
@@ -340,12 +333,10 @@ public class CitaRest {
     }
 
     @PostMapping("/UpdateCita")
-    String UpdateCita(@RequestBody String response) {
-        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
+    String UpdateCita(@RequestBody JSONObject response) {
         try {
-
-            if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
-                Cita UpdateCitaJSON = json.fromJson(jsonResponse.getString("data"), Cita.class);
+            if (DeviceExist(response.getAsString("address"), response.getAsString("nombreDispositivo"))) {
+                Cita UpdateCitaJSON = json.fromJson(response.getAsString("data"), Cita.class);
                 List<Cita> list = CitasBootApplication.jpa.createQuery("select p from Cita p where id=" + UpdateCitaJSON.getIdcita()).getResultList();
 
                 Cita oUpdateCita = list.get(0);
@@ -365,7 +356,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = jsonResponse.getString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo");
                 logger.error(e.toString() + "UpdateCita-" + nombre);
 
             } catch (JSONException js) {
@@ -377,11 +368,10 @@ public class CitaRest {
     }
 
     @PostMapping("/UpdateDoctor")
-    String UpdateDoctor(@RequestBody String response) {
-        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
+    String UpdateDoctor(@RequestBody JSONObject response) {
         try {
-            if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
-                Doctor oDoctorJSON = json.fromJson(jsonResponse.getString("data"), Doctor.class);
+            if (DeviceExist(response.getAsString("address"), response.getAsString("nombreDispositivo"))) {
+                Doctor oDoctorJSON = json.fromJson(response.getAsString("data"), Doctor.class);
                 List<Doctor> list = CitasBootApplication.jpa.createQuery("select p from Doctor p where id=" + oDoctorJSON.getIddoctor()).getResultList();
                 Doctor oDoctorUpdate = list.get(0);
                 oDoctorUpdate.setActivo(oDoctorJSON.isActivo());
@@ -397,7 +387,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = jsonResponse.getString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo");
                 logger.error(e.toString() + "UpdateDoctor-" + nombre);
 
             } catch (JSONException js) {
@@ -410,12 +400,11 @@ public class CitaRest {
 
     //------------------------------------------DELETE--------------------------------------
     @PostMapping("/DeleteSettingsDoctor")
-    String DeleteSettingsDoctor(@RequestBody String response) {
-        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
+    String DeleteSettingsDoctor(@RequestBody JSONObject response) {
         try {
-            
-            if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
-                String id = jsonResponse.get("id").toString();
+
+            if (DeviceExist(response.getAsString("address"), response.getAsString("nombreDispositivo"))) {
+                String id = response.get("id").toString();
                 List<SettingsDoctor> list = CitasBootApplication.jpa.createQuery("select p from SettingsDoctor p where id=" + id).getResultList();
                 CitasBootApplication.jpa.getTransaction().begin();
                 CitasBootApplication.jpa.remove(list.get(0));
@@ -427,7 +416,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = jsonResponse.getString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo");
                 logger.error(e.toString() + "DeleteSettingsDoctor-" + nombre);
 
             } catch (JSONException js) {
@@ -439,12 +428,11 @@ public class CitaRest {
     }
 
     @PostMapping("/DeleteCita")
-    String DeleteCita(@RequestBody String response) {
-        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
+    String DeleteCita(@RequestBody JSONObject response) {
         try {
-            
-            if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
-                String id = jsonResponse.get("id").toString();
+
+            if (DeviceExist(response.getAsString("address"), response.getAsString("nombreDispositivo"))) {
+                String id = response.get("id").toString();
                 List<Cita> list = CitasBootApplication.jpa.createQuery("select p from Cita p where id=" + id).getResultList();
                 CitasBootApplication.jpa.getTransaction().begin();
                 CitasBootApplication.jpa.remove(list.get(0));
@@ -455,7 +443,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = jsonResponse.getString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo");
                 logger.error(e.toString() + "DeleteCita-" + nombre);
 
             } catch (JSONException js) {
@@ -467,11 +455,10 @@ public class CitaRest {
     }
 
     @PostMapping("/DeleteDoctor")
-    String DeleteDoctor(@RequestBody String response) {
-        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
-        try {            
-            if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
-                String id = jsonResponse.get("id").toString();
+    String DeleteDoctor(@RequestBody JSONObject response) {
+        try {
+            if (DeviceExist(response.getAsString("address"), response.getAsString("nombreDispositivo"))) {
+                String id = response.get("id").toString();
                 List<Cita> list = CitasBootApplication.jpa.createQuery("select p from Doctor p where id=" + id).getResultList();
                 CitasBootApplication.jpa.getTransaction().begin();
                 CitasBootApplication.jpa.remove(list.get(0));
@@ -482,7 +469,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = jsonResponse.getString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo");
                 logger.error(e.toString() + "DeleteDoctor-" + nombre);
 
             } catch (JSONException js) {
@@ -517,7 +504,7 @@ public class CitaRest {
 
             }
         } catch (Exception e) {
-            logger.error(e.toString() + " DeviceExist-"+nombreDispositivo);
+            logger.error(e.toString() + " DeviceExist-" + nombreDispositivo);
             return false;
         }
     }
