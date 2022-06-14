@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
+import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -35,10 +36,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 
 public class CitaRest {
-    
+
     private static final Logger logger = LoggerFactory.getLogger(CitaRest.class);
     Gson json = new Gson();
-    
+
     @GetMapping("/employees")
     String all() {
         List<SettingsDoctor> list = CitasBootApplication.jpa.createQuery("select p from SettingsDoctor p").getResultList();
@@ -47,26 +48,32 @@ public class CitaRest {
         ocita = json.fromJson(cita, Cita.class);// a objeto de objeto 
         return cita;
     }
-    
+
     @PostMapping("/SettingsDoctorAll")
     String getSettingsDoctor(@RequestBody String response) {
+        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
         try {
-            org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
+
             if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
                 List<SettingsDoctor> list = CitasBootApplication.jpa.createQuery("select p from SettingsDoctor p").getResultList();
                 return JSONArray.toJSONString(list);
             } else {
                 return "[]";
             }
-        }
-        
-        catch (Exception e) {
-            logger.error(e.toString() +" SettingsDoctorAll");
+        } catch (Exception e) {
+            try {
+                String nombre = jsonResponse.getString("nombreDispositivo");
+                logger.error(e.toString() + "SettingsDoctorAll-" + nombre);
+
+            } catch (JSONException js) {
+                logger.error(js.toString() + "SettingsDoctorAll not found NombreDispositivo");
+            }
+
             return "[]";
         }
-        
+
     }
-    
+
     @PostMapping("/CitaFilter")
     String CitaFilter(@RequestBody JSONObject response) {
         try {
@@ -82,24 +89,24 @@ public class CitaRest {
                 } else {
                     listcondicion.add(" fechacita between" + " '" + response.get("fechaInicio") + "' and '" + response.get("fechaFin") + "' ");
                 }
-                
+
                 if (response.get("razon") != null) {
                     listcondicion.add(" razon= '" + response.get("razon") + "'");
                 }
-                
+
                 if (response.get("idhoraatencion") != null) {
                     listcondicion.add(" idhoraatencion= '" + response.get("idhoraatencion") + "'");
                 }
-                
+
                 String condicion = listcondicion.size() == 0 ? "" : "where " + listcondicion.get(0);
                 for (int i = 1; i < listcondicion.size(); i++) {
                     condicion = condicion + " and " + listcondicion.get(i);
                 }
-                
+
                 List<Cita> list = CitasBootApplication.jpa.createQuery("select p from Cita p " + condicion + " order by minuto asc").getResultList();
-                
+
                 String array = "[]";
-                
+
                 if (list.size() > 0) {
                     array = "[ ";
                     for (int i = 0; i < list.size() - 1; i++) {
@@ -111,20 +118,26 @@ public class CitaRest {
             } else {
                 return "[]";
             }
-        } catch (Exception e) {            
-            CitasBootApplication.jpa =  JPAUtil.getEntityManagerFactory().createEntityManager();
+        } catch (Exception e) {
+            CitasBootApplication.jpa = JPAUtil.getEntityManagerFactory().createEntityManager();
+            try {
+                String nombre = response.getAsString("nombreDispositivo");
+                logger.error(e.toString() + "CitaFilter-" + nombre);
+            } catch (JSONException js) {
+                logger.error(js.toString() + "CitaFilter not found NombreDispositivo");
+            }
             return "[]";
         }
     }
-    
+
     @PostMapping("/DoctorAll")
     String getDoctor(@RequestBody String response) {
+        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
         try {
-            org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
             if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
-                Address oaddress = getAddress(jsonResponse.getString("address"));                
+                Address oaddress = getAddress(jsonResponse.getString("address"));
                 List<Doctor> list = new ArrayList<>();
-                
+
                 if (oaddress.getRol().getRolname().equals("ADMINISTRADOR")) {
                     list = CitasBootApplication.jpa.createQuery("select p from Doctor p where flag = false and activo = true order by iddoctor asc").getResultList();
                 } else if (oaddress.getRol().getRolname().equals("DOCTOR")) {
@@ -137,15 +150,22 @@ public class CitaRest {
                 return "[]";
             }
         } catch (Exception e) {
-            logger.error(e.toString()+" DoctorAll");
+            try {
+                String nombre = jsonResponse.getString("nombreDispositivo");
+                logger.error(e.toString() + "DoctorAll-" + nombre);
+
+            } catch (JSONException js) {
+                logger.error(js.toString() + "DoctorAll not found NombreDispositivo");
+            }
+
             return "[]";
         }
     }
-    
+
     @PostMapping("/HoraAtencionAll")
     String getHoraAtencion(@RequestBody String response) {
+        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
         try {
-            org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
             if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
                 List<HoraAtencion> list = CitasBootApplication.jpa.createQuery("select p from HoraAtencion p order by idhoraatencion ASC").getResultList();
                 return JSONArray.toJSONString(list);
@@ -153,7 +173,14 @@ public class CitaRest {
                 return "[]";
             }
         } catch (Exception e) {
-            logger.error(e.toString()+ "HoraAtencionAll");
+            try {
+                String nombre = jsonResponse.getString("nombreDispositivo");
+                logger.error(e.toString() + "HoraAtencionAll-" + nombre);
+
+            } catch (JSONException js) {
+                logger.error(js.toString() + "HoraAtencionAll not found NombreDispositivo");
+            }
+
             return "[]";
         }
     }
@@ -161,13 +188,13 @@ public class CitaRest {
 
     @PostMapping("/GetListCitasByFecha")
     String getCitasByFecha(@RequestBody String response) {
+        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
         try {
-            org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
             if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
                 String id = jsonResponse.get("fecha").toString();
                 List<Cita> list = CitasBootApplication.jpa.createQuery("select p from Cita p where EXTRACT(year from fechacita)=" + id + "order by minuto ASC").getResultList();
                 String array = "[]";
-                
+
                 if (list.size() > 0) {
                     array = "[ ";
                     for (int i = 0; i < list.size() - 1; i++) {
@@ -180,15 +207,22 @@ public class CitaRest {
                 return "[ ]";
             }
         } catch (Exception e) {
-            logger.error(e.toString() +" GetListCitasByFecha");
+            try {
+                String nombre = jsonResponse.getString("nombreDispositivo");
+                logger.error(e.toString() + "GetListCitasByFecha-" + nombre);
+
+            } catch (JSONException js) {
+                logger.error(js.toString() + "GetListCitasByFecha not found NombreDispositivo");
+            }
+
             return "[]";
         }
     }
-    
+
     @PostMapping("/AddSettingsDoctor")
     String AddSettingsDoctor(@RequestBody String response) {
+        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
         try {
-            org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
             if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
                 SettingsDoctor oAddSettingsDoctor = json.fromJson(jsonResponse.get("data").toString(), SettingsDoctor.class);
                 CitasBootApplication.jpa.getTransaction().begin();
@@ -200,34 +234,56 @@ public class CitaRest {
                 return "sin acceso";
             }
         } catch (Exception e) {
-            logger.error(e.toString() +"AddSettingsDoctor");
-            return "error";
+            try {
+                String nombre = jsonResponse.getString("nombreDispositivo");
+                logger.error(e.toString() + "AddSettingsDoctor-" + nombre);
+
+            } catch (JSONException js) {
+                logger.error(js.toString() + "AddSettingsDoctor not found NombreDispositivo");
+            }
+
+            return "[]";
         }
+
     }
-    
+
     @PostMapping("/AddCita")
     String AddCita(@RequestBody String response) {
+        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
         try {
-            org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
+
             if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
-                Cita oAddCita = json.fromJson(jsonResponse.get("data").toString(), Cita.class);
-                CitasBootApplication.jpa.getTransaction().begin();
-                CitasBootApplication.jpa.persist(oAddCita);
-                CitasBootApplication.jpa.getTransaction().commit();
-                return "ok";
+                Address oaddress = getAddress(jsonResponse.getString("address"));
+                if (oaddress.getRol().getRolname().equals("ADMINISTRADOR") || oaddress.getRol().getRolname().equals("ASISTENTE")) {
+                    Cita oAddCita = json.fromJson(jsonResponse.get("data").toString(), Cita.class);
+                    CitasBootApplication.jpa.getTransaction().begin();
+                    CitasBootApplication.jpa.persist(oAddCita);
+                    CitasBootApplication.jpa.getTransaction().commit();
+                    return "ok";
+                } else {
+                    return "sin permiso";
+                }
             } else {
                 return "sin acceso";
             }
         } catch (Exception e) {
-            logger.error(e.toString()+ " AddCita");
-            return "error";
+            try {
+                String nombre = jsonResponse.getString("nombreDispositivo");
+                logger.error(e.toString() + "AddCita-" + nombre);
+
+            } catch (JSONException js) {
+                logger.error(js.toString() + "AddCita not found NombreDispositivo");
+            }
+
+            return "[]";
         }
     }
-    
+
     @PostMapping("/AddDoctor")
     String AddDoctor(@RequestBody String response) {
+        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
         try {
-            org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
+
             if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
                 Doctor AddDoctor = json.fromJson(jsonResponse.get("data").toString(), Doctor.class);
                 CitasBootApplication.jpa.getTransaction().begin();
@@ -238,23 +294,31 @@ public class CitaRest {
                 return "sin acceso";
             }
         } catch (Exception e) {
-            logger.error(e.toString()+ " AddDoctor");
-            return "error";
+            try {
+                String nombre = jsonResponse.getString("nombreDispositivo");
+                logger.error(e.toString() + "AddDoctor-" + nombre);
+
+            } catch (JSONException js) {
+                logger.error(js.toString() + "AddDoctor not found NombreDispositivo");
+            }
+
+            return "[]";
         }
     }
 
     //------------------------------------------UPDATE--------------------------------------
     @PostMapping("/UpdateSettingsDoctor")
     String UpdateSettingsDoctor(@RequestBody String response) {
+        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
         try {
-            org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
+
             if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
                 SettingsDoctor oSettingsDoctorJSON = json.fromJson(jsonResponse.getString("data"), SettingsDoctor.class);
                 List<SettingsDoctor> list = CitasBootApplication.jpa.createQuery("select p from SettingsDoctor p where id=" + oSettingsDoctorJSON.getId()).getResultList();
                 SettingsDoctor oSettingsDoctorUpdate = list.get(0);
                 oSettingsDoctorUpdate.setDoctor(oSettingsDoctorJSON.getDoctor());
                 oSettingsDoctorUpdate.setName(oSettingsDoctorJSON.getName());
-                
+
                 CitasBootApplication.jpa.getTransaction().begin();
                 CitasBootApplication.jpa.persist(oSettingsDoctorUpdate);
                 CitasBootApplication.jpa.getTransaction().commit();
@@ -263,19 +327,27 @@ public class CitaRest {
                 return "sin acceso";
             }
         } catch (Exception e) {
-            logger.error(e.toString()+ " UpdateSettingsDoctor");
-            return "error";
+            try {
+                String nombre = jsonResponse.getString("nombreDispositivo");
+                logger.error(e.toString() + "UpdateSettingsDoctor-" + nombre);
+
+            } catch (JSONException js) {
+                logger.error(js.toString() + "UpdateSettingsDoctor not found NombreDispositivo");
+            }
+
+            return "[]";
         }
     }
-    
+
     @PostMapping("/UpdateCita")
     String UpdateCita(@RequestBody String response) {
+        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
         try {
-            org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
+
             if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
                 Cita UpdateCitaJSON = json.fromJson(jsonResponse.getString("data"), Cita.class);
                 List<Cita> list = CitasBootApplication.jpa.createQuery("select p from Cita p where id=" + UpdateCitaJSON.getIdcita()).getResultList();
-                
+
                 Cita oUpdateCita = list.get(0);
                 oUpdateCita.setDoctor(UpdateCitaJSON.getDoctor());
                 oUpdateCita.setHoraatencion(UpdateCitaJSON.getHoraatencion());
@@ -283,7 +355,7 @@ public class CitaRest {
                 oUpdateCita.setMinuto(UpdateCitaJSON.getMinuto());
                 oUpdateCita.setFechacita(UpdateCitaJSON.getFechacita());
                 oUpdateCita.setRazon(UpdateCitaJSON.getRazon());
-                
+
                 CitasBootApplication.jpa.getTransaction().begin();
                 CitasBootApplication.jpa.persist(oUpdateCita);
                 CitasBootApplication.jpa.getTransaction().commit();
@@ -292,15 +364,22 @@ public class CitaRest {
                 return "sin acceso";
             }
         } catch (Exception e) {
-            logger.error(e.toString()+" UpdateCita");
-            return "error";
+            try {
+                String nombre = jsonResponse.getString("nombreDispositivo");
+                logger.error(e.toString() + "UpdateCita-" + nombre);
+
+            } catch (JSONException js) {
+                logger.error(js.toString() + "UpdateCita not found NombreDispositivo");
+            }
+
+            return "[]";
         }
     }
-    
+
     @PostMapping("/UpdateDoctor")
     String UpdateDoctor(@RequestBody String response) {
+        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
         try {
-            org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
             if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
                 Doctor oDoctorJSON = json.fromJson(jsonResponse.getString("data"), Doctor.class);
                 List<Doctor> list = CitasBootApplication.jpa.createQuery("select p from Doctor p where id=" + oDoctorJSON.getIddoctor()).getResultList();
@@ -308,7 +387,7 @@ public class CitaRest {
                 oDoctorUpdate.setActivo(oDoctorJSON.isActivo());
                 oDoctorUpdate.setFlag(oDoctorJSON.isFlag());
                 oDoctorUpdate.setNombredoctor(oDoctorJSON.getNombredoctor());
-                
+
                 CitasBootApplication.jpa.getTransaction().begin();
                 CitasBootApplication.jpa.persist(oDoctorUpdate);
                 CitasBootApplication.jpa.getTransaction().commit();
@@ -317,37 +396,53 @@ public class CitaRest {
                 return "sin acceso";
             }
         } catch (Exception e) {
-            logger.error(e.toString() +" UpdateDoctor");
-            return "error";
+            try {
+                String nombre = jsonResponse.getString("nombreDispositivo");
+                logger.error(e.toString() + "UpdateDoctor-" + nombre);
+
+            } catch (JSONException js) {
+                logger.error(js.toString() + "UpdateDoctor not found NombreDispositivo");
+            }
+
+            return "[]";
         }
     }
 
     //------------------------------------------DELETE--------------------------------------
     @PostMapping("/DeleteSettingsDoctor")
     String DeleteSettingsDoctor(@RequestBody String response) {
+        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
         try {
-            org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
+            
             if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
                 String id = jsonResponse.get("id").toString();
                 List<SettingsDoctor> list = CitasBootApplication.jpa.createQuery("select p from SettingsDoctor p where id=" + id).getResultList();
                 CitasBootApplication.jpa.getTransaction().begin();
                 CitasBootApplication.jpa.remove(list.get(0));
                 CitasBootApplication.jpa.getTransaction().commit();
-                
+
                 return "ok";
             } else {
                 return "sin acceso";
             }
         } catch (Exception e) {
-            logger.error(e.toString()+" DeleteSettingsDoctor");
-            return "error]";
+            try {
+                String nombre = jsonResponse.getString("nombreDispositivo");
+                logger.error(e.toString() + "DeleteSettingsDoctor-" + nombre);
+
+            } catch (JSONException js) {
+                logger.error(js.toString() + "DeleteSettingsDoctor not found NombreDispositivo");
+            }
+
+            return "[]";
         }
     }
-    
+
     @PostMapping("/DeleteCita")
     String DeleteCita(@RequestBody String response) {
+        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
         try {
-            org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
+            
             if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
                 String id = jsonResponse.get("id").toString();
                 List<Cita> list = CitasBootApplication.jpa.createQuery("select p from Cita p where id=" + id).getResultList();
@@ -359,15 +454,22 @@ public class CitaRest {
                 return "sin acceso";
             }
         } catch (Exception e) {
-            logger.error(e.toString()+ " DeleteCita");
-            return "error";
+            try {
+                String nombre = jsonResponse.getString("nombreDispositivo");
+                logger.error(e.toString() + "DeleteCita-" + nombre);
+
+            } catch (JSONException js) {
+                logger.error(js.toString() + "DeleteCita not found NombreDispositivo");
+            }
+
+            return "[]";
         }
     }
-    
+
     @PostMapping("/DeleteDoctor")
     String DeleteDoctor(@RequestBody String response) {
-        try {
-            org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
+        org.json.JSONObject jsonResponse = new org.json.JSONObject(response);
+        try {            
             if (DeviceExist(jsonResponse.getString("address"), jsonResponse.getString("nombreDispositivo"))) {
                 String id = jsonResponse.get("id").toString();
                 List<Cita> list = CitasBootApplication.jpa.createQuery("select p from Doctor p where id=" + id).getResultList();
@@ -379,11 +481,18 @@ public class CitaRest {
                 return "sin acceso";
             }
         } catch (Exception e) {
-            logger.error(e.toString()+ " DeleteDoctor");
-            return "error]";
+            try {
+                String nombre = jsonResponse.getString("nombreDispositivo");
+                logger.error(e.toString() + "DeleteDoctor-" + nombre);
+
+            } catch (JSONException js) {
+                logger.error(js.toString() + "DeleteDoctor not found NombreDispositivo");
+            }
+
+            return "[]";
         }
     }
-    
+
     boolean DeviceExist(String address, String nombreDispositivo) {
         try {
             //true si existe, false si no existe
@@ -405,20 +514,20 @@ public class CitaRest {
                 } else {
                     return false;
                 }
-                
+
             }
         } catch (Exception e) {
-            logger.error(e.toString()+" DeviceExist");
+            logger.error(e.toString() + " DeviceExist-"+nombreDispositivo);
             return false;
         }
     }
-    
+
     Address getAddress(String address) {
-        
+
         List<Address> listAdress = CitasBootApplication.jpa.createQuery("select p from Address p where address ='" + address + "'").getResultList();
         return listAdress.get(0);
     }
-    
+
     SettingsDoctor getSettingDoctor(String address) {
         List<SettingsDoctor> listSettingsDoctor = CitasBootApplication.jpa.createQuery("select p from SettingsDoctor p where name ='" + address + "'").getResultList();
         return listSettingsDoctor.get(0);
