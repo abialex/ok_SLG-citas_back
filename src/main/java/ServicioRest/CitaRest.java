@@ -61,7 +61,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
                 logger.error(e.toString() + "SettingsDoctorAll-" + nombre);
 
             } catch (JSONException js) {
@@ -120,9 +120,8 @@ public class CitaRest {
         } catch (Exception e) {
             CitasBootApplication.jpa = JPAUtil.getEntityManagerFactory().createEntityManager();
             try {
-                String nombre = response.getAsString("nombreDispositivo");
-                String version = response.getAsString("version");
-                logger.error(e.toString() + " CitaFilter-" + nombre + "-" + version);
+                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
+                logger.error(e.toString() + " CitaFilter-" + nombre);
             } catch (JSONException js) {
                 logger.error(js.toString() + " CitaFilter not found NombreDispositivo");
             }
@@ -150,7 +149,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
                 logger.error(e.toString() + "DoctorAll-" + nombre);
 
             } catch (JSONException js) {
@@ -172,7 +171,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
                 logger.error(e.toString() + "HoraAtencionAll-" + nombre);
 
             } catch (JSONException js) {
@@ -205,7 +204,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
                 logger.error(e.toString() + "GetListCitasByFecha-" + nombre);
 
             } catch (JSONException js) {
@@ -231,7 +230,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
                 logger.error(e.toString() + "AddSettingsDoctor-" + nombre);
 
             } catch (JSONException js) {
@@ -263,7 +262,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
                 logger.error(e.toString() + "AddCita-" + nombre);
 
             } catch (JSONException js) {
@@ -289,7 +288,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
                 logger.error(e.toString() + "AddDoctor-" + nombre);
 
             } catch (JSONException js) {
@@ -321,7 +320,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
                 logger.error(e.toString() + "UpdateSettingsDoctor-" + nombre);
 
             } catch (JSONException js) {
@@ -356,7 +355,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
                 logger.error(e.toString() + "UpdateCita-" + nombre);
 
             } catch (JSONException js) {
@@ -387,7 +386,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
                 logger.error(e.toString() + "UpdateDoctor-" + nombre);
 
             } catch (JSONException js) {
@@ -416,7 +415,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
                 logger.error(e.toString() + "DeleteSettingsDoctor-" + nombre);
 
             } catch (JSONException js) {
@@ -443,7 +442,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
                 logger.error(e.toString() + "DeleteCita-" + nombre);
 
             } catch (JSONException js) {
@@ -469,7 +468,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo");
+                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
                 logger.error(e.toString() + "DeleteDoctor-" + nombre);
 
             } catch (JSONException js) {
