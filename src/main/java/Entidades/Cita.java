@@ -45,24 +45,29 @@ public class Cita implements Serializable {
 
     @Column(name = "razon", nullable = true)
     private String razon;
+    
+    @Column(name = "celular", nullable = true)
+    private String celular;
 
     public Cita() {
     }
 
-    public Cita(Doctor doctor, String pacientenombr, HoraAtencion horaatencion, LocalDate fechacita, String razon, String minuto) {
+    public Cita(Doctor doctor, String pacientenombr, HoraAtencion horaatencion, LocalDate fechacita, String razon, String minuto, String celular) {
         this.doctor = doctor;
         this.nombrepaciente = pacientenombr;
         this.horaatencion = horaatencion;
         this.fechacita = fechacita;
         this.razon = razon;
         this.minuto = minuto;
+        this.celular = celular;
     }
 
-    public Cita(Doctor doctor, HoraAtencion horaatencion, LocalDate fechacita, String razon) {
+    public Cita(Doctor doctor, HoraAtencion horaatencion, LocalDate fechacita, String razon, String celular) {
         this.doctor = doctor;
         this.horaatencion = horaatencion;
         this.fechacita = fechacita;
         this.razon = razon;
+        this.celular = celular;
     }
 
     public int getIdcita() {
@@ -121,4 +126,12 @@ public class Cita implements Serializable {
         this.minuto = minuto;
     }
 
+    public String getCelular() {
+        return celular;
+    }
+
+    public void setCelular(String celular) {
+        this.celular = celular;
+    }
+  
 }

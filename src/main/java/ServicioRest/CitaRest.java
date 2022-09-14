@@ -48,6 +48,30 @@ public class CitaRest {
         ocita = json.fromJson(cita, Cita.class);// a objeto de objeto 
         return cita;
     }
+    
+    @PostMapping("/GetRol")
+    String getRol(@RequestBody JSONObject response) {
+        try {
+
+            if (DeviceExist(response.getAsString("address"), response.getAsString("nombreDispositivo"))) {
+                Address oaddress = getAddress(response.getAsString("address"));
+                return oaddress.getRol().getRolname();
+            } else {
+                return "[]";
+            }
+        } catch (Exception e) {
+            try {
+                String nombre = response.getAsString("nombreDispositivo") + "-" + response.getAsString("version");
+                logger.error(e.toString() + "SettingsDoctorAll-" + nombre);
+
+            } catch (JSONException js) {
+                logger.error(js.toString() + "SettingsDoctorAll not found NombreDispositivo");
+            }
+
+            return "[]";
+        }
+
+    }
 
     @PostMapping("/SettingsDoctorAll")
     String getSettingsDoctor(@RequestBody JSONObject response) {
@@ -61,7 +85,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
+                String nombre = response.getAsString("nombreDispositivo") + "-" + response.getAsString("version");
                 logger.error(e.toString() + "SettingsDoctorAll-" + nombre);
 
             } catch (JSONException js) {
@@ -120,7 +144,7 @@ public class CitaRest {
         } catch (Exception e) {
             CitasBootApplication.jpa = JPAUtil.getEntityManagerFactory().createEntityManager();
             try {
-                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
+                String nombre = response.getAsString("nombreDispositivo") + "-" + response.getAsString("version");
                 logger.error(e.toString() + " CitaFilter-" + nombre);
             } catch (JSONException js) {
                 logger.error(js.toString() + " CitaFilter not found NombreDispositivo");
@@ -149,7 +173,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
+                String nombre = response.getAsString("nombreDispositivo") + "-" + response.getAsString("version");
                 logger.error(e.toString() + "DoctorAll-" + nombre);
 
             } catch (JSONException js) {
@@ -171,7 +195,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
+                String nombre = response.getAsString("nombreDispositivo") + "-" + response.getAsString("version");
                 logger.error(e.toString() + "HoraAtencionAll-" + nombre);
 
             } catch (JSONException js) {
@@ -204,7 +228,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
+                String nombre = response.getAsString("nombreDispositivo") + "-" + response.getAsString("version");
                 logger.error(e.toString() + "GetListCitasByFecha-" + nombre);
 
             } catch (JSONException js) {
@@ -230,7 +254,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
+                String nombre = response.getAsString("nombreDispositivo") + "-" + response.getAsString("version");
                 logger.error(e.toString() + "AddSettingsDoctor-" + nombre);
 
             } catch (JSONException js) {
@@ -262,7 +286,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
+                String nombre = response.getAsString("nombreDispositivo") + "-" + response.getAsString("version");
                 logger.error(e.toString() + "AddCita-" + nombre);
 
             } catch (JSONException js) {
@@ -288,7 +312,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
+                String nombre = response.getAsString("nombreDispositivo") + "-" + response.getAsString("version");
                 logger.error(e.toString() + "AddDoctor-" + nombre);
 
             } catch (JSONException js) {
@@ -301,7 +325,7 @@ public class CitaRest {
 
     //------------------------------------------UPDATE--------------------------------------
     @PostMapping("/UpdateSettingsDoctor")
-    String UpdateSettingsDoctor(@RequestBody JSONObject response) {        
+    String UpdateSettingsDoctor(@RequestBody JSONObject response) {
         try {
 
             if (DeviceExist(response.getAsString("address"), response.getAsString("nombreDispositivo"))) {
@@ -320,7 +344,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
+                String nombre = response.getAsString("nombreDispositivo") + "-" + response.getAsString("version");
                 logger.error(e.toString() + "UpdateSettingsDoctor-" + nombre);
 
             } catch (JSONException js) {
@@ -345,6 +369,7 @@ public class CitaRest {
                 oUpdateCita.setMinuto(UpdateCitaJSON.getMinuto());
                 oUpdateCita.setFechacita(UpdateCitaJSON.getFechacita());
                 oUpdateCita.setRazon(UpdateCitaJSON.getRazon());
+                oUpdateCita.setCelular(UpdateCitaJSON.getCelular());
 
                 CitasBootApplication.jpa.getTransaction().begin();
                 CitasBootApplication.jpa.persist(oUpdateCita);
@@ -355,7 +380,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
+                String nombre = response.getAsString("nombreDispositivo") + "-" + response.getAsString("version");
                 logger.error(e.toString() + "UpdateCita-" + nombre);
 
             } catch (JSONException js) {
@@ -386,7 +411,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
+                String nombre = response.getAsString("nombreDispositivo") + "-" + response.getAsString("version");
                 logger.error(e.toString() + "UpdateDoctor-" + nombre);
 
             } catch (JSONException js) {
@@ -415,7 +440,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
+                String nombre = response.getAsString("nombreDispositivo") + "-" + response.getAsString("version");
                 logger.error(e.toString() + "DeleteSettingsDoctor-" + nombre);
 
             } catch (JSONException js) {
@@ -442,7 +467,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
+                String nombre = response.getAsString("nombreDispositivo") + "-" + response.getAsString("version");
                 logger.error(e.toString() + "DeleteCita-" + nombre);
 
             } catch (JSONException js) {
@@ -468,7 +493,7 @@ public class CitaRest {
             }
         } catch (Exception e) {
             try {
-                String nombre = response.getAsString("nombreDispositivo") +"-"+ response.getAsString("version");
+                String nombre = response.getAsString("nombreDispositivo") + "-" + response.getAsString("version");
                 logger.error(e.toString() + "DeleteDoctor-" + nombre);
 
             } catch (JSONException js) {
