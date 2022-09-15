@@ -48,17 +48,14 @@ public class CitaRest {
         ocita = json.fromJson(cita, Cita.class);// a objeto de objeto 
         return cita;
     }
-    
-    @PostMapping("/GetRol")
-    String getRol(@RequestBody JSONObject response) {
-        try {
 
-            if (DeviceExist(response.getAsString("address"), response.getAsString("nombreDispositivo"))) {
-                Address oaddress = getAddress(response.getAsString("address"));
-                return oaddress.getRol().getRolname();
-            } else {
-                return "[]";
-            }
+    @PostMapping("/GetAddress")
+    String getAddress(@RequestBody JSONObject response) {
+        try {
+            DeviceExist(response.getAsString("address"), response.getAsString("nombreDispositivo"));
+            Address oaddress = getAddress(response.getAsString("address"));
+            return json.toJson(oaddress);
+
         } catch (Exception e) {
             try {
                 String nombre = response.getAsString("nombreDispositivo") + "-" + response.getAsString("version");
