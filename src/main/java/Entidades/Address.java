@@ -32,6 +32,10 @@ public class Address {
     private boolean activo;
 
     @ManyToOne
+    @JoinColumn(insertable = true, updatable = true, name = "idlugar", nullable = true)
+    private Lugar lugar;
+
+    @ManyToOne
     @JoinColumn(insertable = true, updatable = true, name = "idrol", nullable = true)
     private Rol rol;
 
@@ -76,6 +80,14 @@ public class Address {
 
     public void setRol(Rol rol) {
         this.rol = rol;
+    }
+
+    public Lugar getLugar() {
+        return lugar;
+    }
+
+    public void setLugar(Lugar lugar) {
+        this.lugar = lugar;
     }
 
 }

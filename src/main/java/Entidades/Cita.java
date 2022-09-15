@@ -34,6 +34,10 @@ public class Cita implements Serializable {
     @JoinColumn(insertable = true, updatable = true, name = "idhoraatencion", nullable = false)
     private HoraAtencion horaatencion;
 
+    @ManyToOne
+    @JoinColumn(insertable = true, updatable = true, name = "idlugar", nullable = true)
+    private Lugar lugar;
+
     @Column(name = "nombrepaciente", nullable = true)
     private String nombrepaciente;
 
@@ -45,7 +49,7 @@ public class Cita implements Serializable {
 
     @Column(name = "razon", nullable = true)
     private String razon;
-    
+
     @Column(name = "celular", nullable = true)
     private String celular;
 
@@ -133,5 +137,13 @@ public class Cita implements Serializable {
     public void setCelular(String celular) {
         this.celular = celular;
     }
-  
+
+    public Lugar getLugar() {
+        return lugar;
+    }
+
+    public void setLugar(Lugar lugar) {
+        this.lugar = lugar;
+    }
+
 }
