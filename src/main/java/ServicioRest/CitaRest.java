@@ -7,6 +7,7 @@ package ServicioRest;
 import EntidadesSettings.SettingsDoctor;
 import Controller.CitasBootApplication;
 import Entidades.Address;
+import Entidades.Address_Doctor;
 import Entidades.Cita;
 import Entidades.Doctor;
 import Entidades.HoraAtencion;
@@ -59,6 +60,27 @@ public class CitaRest {
         } catch (Exception e) {
             try {
                 String nombre = response.getAsString("nombreDispositivo") + "-" + response.getAsString("version");
+                logger.error(e.toString() + " SettingsDoctorAll-" + nombre);
+
+            } catch (JSONException js) {
+                logger.error(js.toString() + " SettingsDoctorAll not found NombreDispositivo");
+            }
+
+            return "[]";
+        }
+
+    }
+
+    @PostMapping("/GetRol")
+    String getRol(@RequestBody JSONObject response) {
+        try {
+            DeviceExist(response.getAsString("address"), response.getAsString("nombreDispositivo"));
+            Address oaddress = getAddress(response.getAsString("address"));
+            return json.toJson(oaddress.getRol().getRolname());
+
+        } catch (Exception e) {
+            try {
+                String nombre = response.getAsString("nombreDispositivo") + "-" + response.getAsString("version");
                 logger.error(e.toString() + "SettingsDoctorAll-" + nombre);
 
             } catch (JSONException js) {
@@ -75,7 +97,8 @@ public class CitaRest {
         try {
 
             if (DeviceExist(response.getAsString("address"), response.getAsString("nombreDispositivo"))) {
-                List<SettingsDoctor> list = CitasBootApplication.jpa.createQuery("select p from SettingsDoctor p").getResultList();
+                Address oaddres=getAddress(response.getAsString("address"));
+                List<SettingsDoctor> list = CitasBootApplication.jpa.createQuery("select p from SettingsDoctor p where idaddress="+oaddres.getId()+" or name= '"+response.getAsString("address")+"'").getResultList();
                 return JSONArray.toJSONString(list);
             } else {
                 return "[]";
@@ -159,10 +182,12 @@ public class CitaRest {
 
                 if (oaddress.getRol().getRolname().equals("ADMINISTRADOR")) {
                     list = CitasBootApplication.jpa.createQuery("select p from Doctor p where flag = false and activo = true order by iddoctor asc").getResultList();
-                } else if (oaddress.getRol().getRolname().equals("DOCTOR")) {
-                    SettingsDoctor osettingsdoctor = getSettingDoctor(response.getAsString("address"));
-                    System.out.println(osettingsdoctor.getId());
-                    list = CitasBootApplication.jpa.createQuery("select p from Doctor p where flag = false and activo = true and iddoctor =" + osettingsdoctor.getDoctor().getIddoctor() + " order by iddoctor asc").getResultList();
+                } else if (oaddress.getRol().getRolname().equals("OBSERVADOR") || oaddress.getRol().getRolname().equals("ASISTENTA")) {
+                    List<Address_Doctor> listaddress_doctor = CitasBootApplication.jpa.createQuery("select p from Address_Doctor p where idaddress=" + oaddress.getId() + " order by id asc").getResultList();
+                    for (Address_Doctor address_Doctor : listaddress_doctor) {
+                        list.add(address_Doctor.getDoctor());
+
+                    }
                 }
                 return JSONArray.toJSONString(list);
             } else {
@@ -269,7 +294,7 @@ public class CitaRest {
 
             if (DeviceExist(response.getAsString("address"), response.getAsString("nombreDispositivo"))) {
                 Address oaddress = getAddress(response.getAsString("address"));
-                if (oaddress.getRol().getRolname().equals("ADMINISTRADOR") || oaddress.getRol().getRolname().equals("ASISTENTE")) {
+                if (oaddress.getRol().getRolname().equals("ADMINISTRADOR") || oaddress.getRol().getRolname().equals("ASISTENTA")) {
                     Cita oAddCita = json.fromJson(response.get("data").toString(), Cita.class);
                     CitasBootApplication.jpa.getTransaction().begin();
                     CitasBootApplication.jpa.persist(oAddCita);
@@ -536,8 +561,8 @@ public class CitaRest {
         return listAdress.get(0);
     }
 
-    SettingsDoctor getSettingDoctor(String address) {
-        List<SettingsDoctor> listSettingsDoctor = CitasBootApplication.jpa.createQuery("select p from SettingsDoctor p where name ='" + address + "'").getResultList();
+    SettingsDoctor getSettingDoctor(Address address) {
+        List<SettingsDoctor> listSettingsDoctor = CitasBootApplication.jpa.createQuery("select p from SettingsDoctor p where idaddress ='" + address.getId() + "'").getResultList();
         return listSettingsDoctor.get(0);
     }
 }
