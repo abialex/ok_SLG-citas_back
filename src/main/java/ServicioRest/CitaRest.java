@@ -97,8 +97,8 @@ public class CitaRest {
         try {
 
             if (DeviceExist(response.getAsString("address"), response.getAsString("nombreDispositivo"))) {
-                Address oaddres=getAddress(response.getAsString("address"));
-                List<SettingsDoctor> list = CitasBootApplication.jpa.createQuery("select p from SettingsDoctor p where idaddress="+oaddres.getId()+" or name= '"+response.getAsString("address")+"'").getResultList();
+                Address oaddres = getAddress(response.getAsString("address"));
+                List<SettingsDoctor> list = CitasBootApplication.jpa.createQuery("select p from SettingsDoctor p where idaddress=" + oaddres.getId() + " or name= '" + response.getAsString("address") + "'").getResultList();
                 return JSONArray.toJSONString(list);
             } else {
                 return "[]";
@@ -296,9 +296,21 @@ public class CitaRest {
                 Address oaddress = getAddress(response.getAsString("address"));
                 if (oaddress.getRol().getRolname().equals("ADMINISTRADOR") || oaddress.getRol().getRolname().equals("ASISTENTA")) {
                     Cita oAddCita = json.fromJson(response.get("data").toString(), Cita.class);
-                    CitasBootApplication.jpa.getTransaction().begin();
-                    CitasBootApplication.jpa.persist(oAddCita);
-                    CitasBootApplication.jpa.getTransaction().commit();
+
+                    if (response.getAsString("version") != null) {
+                        if (response.getAsString("version").equals("citas_v2_2_2809_web")) {
+                            CitasBootApplication.jpa.getTransaction().begin();
+                            CitasBootApplication.jpa.persist(oAddCita);
+                            CitasBootApplication.jpa.getTransaction().commit();
+
+                        }
+                    } else {
+                        CitasBootApplication.jpa.getTransaction().begin();
+                        CitasBootApplication.jpa.persist(oAddCita);
+                        CitasBootApplication.jpa.getTransaction().commit();
+
+                    }
+
                     return "ok";
                 } else {
                     return "sin permiso";
